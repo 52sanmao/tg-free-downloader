@@ -1,7 +1,21 @@
 // Telegram API credentials
-// Get yours at https://my.telegram.org/apps (free, requires Telegram login)
-// In production, set VITE_API_ID and VITE_API_HASH env vars, or fill in below
-const API_ID = Number(import.meta.env.VITE_API_ID) || 0
-const API_HASH = import.meta.env.VITE_API_HASH || ''
+// Priority: localStorage (user-set) > env vars (CI/build-time) > defaults
+export function getApiId() {
+  if (typeof localStorage !== 'undefined') {
+    const v = localStorage.getItem('tg-api-id')
+    if (v) return Number(v)
+  }
+  return Number(import.meta.env.VITE_API_ID) || 0
+}
 
-export { API_ID, API_HASH }
+export function getApiHash() {
+  if (typeof localStorage !== 'undefined') {
+    const v = localStorage.getItem('tg-api-hash')
+    if (v) return v
+  }
+  return import.meta.env.VITE_API_HASH || ''
+}
+
+export function isSetupComplete() {
+  return typeof localStorage !== 'undefined' && localStorage.getItem('tg-setup-done') === '1'
+}

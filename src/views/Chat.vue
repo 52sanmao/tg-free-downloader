@@ -194,7 +194,8 @@ function handleMsgClick(msg) {
 
 async function downloadSingle(msg) {
   try {
-    const path = await window.electronAPI.saveFile({
+    const { ipcRenderer } = window.require('electron')
+    const path = await ipcRenderer.invoke('save-file', {
       defaultName: `media_${msg.id}${getExt(msg)}`,
       extensions: undefined
     })
@@ -209,7 +210,8 @@ async function downloadSingle(msg) {
 }
 
 async function downloadSelected() {
-  const dir = await window.electronAPI.selectFile({ isDir: true })
+  const { ipcRenderer } = window.require('electron')
+  const dir = await ipcRenderer.invoke('select-file', { isDir: true })
   if (!dir) return
   taskStore.addBatchTask(chatStore.currentChat.id, selectedMessages.value, dir)
   selectedMessages.value = []

@@ -20,6 +20,11 @@ const router = useRouter()
 const isDark = ref(true)
 
 onMounted(async () => {
+  const { isSetupComplete } = await import('./services/config')
+  if (!isSetupComplete()) {
+    router.push('/setup')
+    return
+  }
   const loggedIn = await userStore.tryAutoLogin()
   if (!loggedIn) {
     router.push('/login')

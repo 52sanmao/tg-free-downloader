@@ -118,7 +118,8 @@ function saveProxy() {
 }
 
 async function selectDownloadDir() {
-  const dir = await window.electronAPI.selectFile({ isDir: true })
+  const { ipcRenderer } = window.require('electron')
+  const dir = await ipcRenderer.invoke('select-file', { isDir: true })
   if (dir) {
     downloadDir.value = dir
     localStorage.setItem('download-dir', dir)
@@ -131,7 +132,8 @@ function handleLogout() {
 }
 
 function openLink(url) {
-  if (window.electronAPI) window.electronAPI.openExternal(url)
+  const { shell } = window.require('electron')
+  shell.openExternal(url)
 }
 
 onMounted(() => {

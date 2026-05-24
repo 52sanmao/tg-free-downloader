@@ -6,9 +6,16 @@ export default defineConfig({
   plugins: [
     vue(),
     {
-      name: 'remove-crossorigin',
-      transformIndexHtml(html) {
-        return html.replace(/\bcrossorigin\b/g, '')
+      name: 'fix-gramjs-inspect',
+      resolveId(id) {
+        if (id === 'util' || id.endsWith('/telegram/inspect.js') || id.endsWith('\\telegram\\inspect.js')) {
+          return '\0util-shim'
+        }
+      },
+      load(id) {
+        if (id === '\0util-shim') {
+          return 'export const inspect = { custom: Symbol.for("nodejs.util.inspect.custom") }; export default { inspect }'
+        }
       }
     }
   ],
@@ -22,9 +29,10 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     emptyOutDir: true,
+    target: 'esnext',
     rollupOptions: {
-      external: ['electron']
-    }
+      external: ['electron'],
+    },
   },
   server: {
     port: 5173

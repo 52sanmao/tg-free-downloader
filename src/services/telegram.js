@@ -2,7 +2,7 @@ import { TelegramClient } from 'telegram'
 import { StringSession } from 'telegram/sessions'
 import { Api } from 'telegram'
 import { storeSession } from './session'
-import { API_ID, API_HASH } from './config'
+import { getApiId, getApiHash } from './config'
 
 let client = null
 
@@ -12,7 +12,7 @@ export function getClient() {
 
 export async function initClient(sessionStr) {
   const stringSession = new StringSession(sessionStr || '')
-  client = new TelegramClient(stringSession, API_ID, API_HASH, {
+  client = new TelegramClient(stringSession, getApiId(), getApiHash(), {
     connectionRetries: 5,
     useWSS: false,
   })
@@ -43,8 +43,8 @@ export function onQRUpdate(cb) {
 export async function getQRLogin() {
   if (!client) throw new Error('Client not initialized')
   const result = await client.invoke(new Api.auth.ExportLoginToken({
-    apiId: API_ID,
-    apiHash: API_HASH,
+    apiId: getApiId(),
+    apiHash: getApiHash(),
     exceptIds: [],
   }))
 
@@ -58,8 +58,8 @@ export async function checkQRLogin() {
   if (!client) throw new Error('Client not initialized')
   try {
     const result = await client.invoke(new Api.auth.ExportLoginToken({
-      apiId: API_ID,
-      apiHash: API_HASH,
+      apiId: getApiId(),
+      apiHash: getApiHash(),
       exceptIds: [],
     }))
 
@@ -93,8 +93,8 @@ export async function sendCode(phone) {
   if (!client) throw new Error('Client not initialized')
   const result = await client.invoke(new Api.auth.SendCode({
     phoneNumber: phone,
-    apiId: API_ID,
-    apiHash: API_HASH,
+    apiId: getApiId(),
+    apiHash: getApiHash(),
     settings: new Api.CodeSettings({ allowFlashcall: true, currentNumber: true, allowAppHash: true }),
   }))
   return result
