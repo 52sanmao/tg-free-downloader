@@ -3,7 +3,15 @@ import vue from '@vitejs/plugin-vue'
 import path from 'path'
 
 export default defineConfig({
-  plugins: [vue()],
+  plugins: [
+    vue(),
+    {
+      name: 'remove-crossorigin',
+      transformIndexHtml(html) {
+        return html.replace(/\bcrossorigin\b/g, '')
+      }
+    }
+  ],
   root: '.',
   base: './',
   resolve: {

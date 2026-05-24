@@ -6,3 +6,5 @@ release/
 .env
 .DS_Store
 Thumbs.db
+
+downloads/

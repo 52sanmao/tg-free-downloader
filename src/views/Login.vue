@@ -15,7 +15,7 @@
       <div v-if="tab === 'qr'" class="login-form">
         <div v-if="userStore.state === 3" class="qr-container">
           <div class="qr-display">
-            <QRCode :value="qrUrl" :size="220" level="M" render-as="svg" v-if="qrUrl" />
+            <img :src="qrDataUrl" width="220" height="220" v-if="qrDataUrl" />
             <div v-else class="qr-placeholder">生成二维码中...</div>
           </div>
           <p class="qr-hint">使用 Telegram 扫码登录</p>
@@ -85,12 +85,25 @@ const phoneInput = ref('')
 const codeInput = ref('')
 const passwordInput = ref('')
 const qrUrl = ref('')
+const qrDataUrl = ref('')
 let pollTimer = null
+
+function arrayToBase64Url(arr) {
+  const bytes = new Uint8Array(arr)
+  let binary = ''
+  for (let i = 0; i < bytes.length; i++) {
+    binary += String.fromCharCode(bytes[i])
+  }
+  return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
+}
 
 async function startQR() {
   await userStore.startQRLogin()
   if (userStore.state === 3 && userStore.qrToken) {
-    qrUrl.value = `tg://login?token=${Buffer.from(userStore.qrToken).toString('base64url')}`
+    qrUrl.value = `tg://login?token=${arrayToBase64Url(userStore.qrToken)}`
+    QRCode.toDataURL(qrUrl.value, { width: 220, margin: 2 }, (err, url) => {
+      if (!err) qrDataUrl.value = url
+    })
     pollTimer = setInterval(pollQR, 3000)
   }
 }
