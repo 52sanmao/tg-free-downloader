@@ -1,7 +1,32 @@
 const { app, BrowserWindow, ipcMain, dialog, shell } = require('electron')
 const path = require('path')
+const http = require('http')
+const fs = require('fs')
 
 let mainWindow = null
+
+const MIME = {
+  '.html': 'text/html', '.js': 'application/javascript', '.css': 'text/css',
+  '.svg': 'image/svg+xml', '.png': 'image/png', '.json': 'application/json',
+  '.woff2': 'font/woff2', '.map': 'application/json',
+}
+
+function startProdServer() {
+  const dist = path.join(__dirname, '../dist')
+  return new Promise((resolve) => {
+    const server = http.createServer((req, res) => {
+      let urlPath = decodeURIComponent(new URL(req.url, 'http://localhost').pathname)
+      let filePath = path.join(dist, urlPath === '/' ? 'index.html' : urlPath)
+      if (!fs.existsSync(filePath)) {
+        filePath = path.join(dist, 'index.html')
+      }
+      const ext = path.extname(filePath)
+      res.writeHead(200, { 'Content-Type': MIME[ext] || 'application/octet-stream' })
+      fs.createReadStream(filePath).pipe(res)
+    })
+    server.listen(0, () => resolve(`http://localhost:${server.address().port}`))
+  })
+}
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -22,7 +47,9 @@ function createWindow() {
     mainWindow.loadURL(process.env.VITE_DEV_SERVER_URL)
     mainWindow.webContents.openDevTools()
   } else {
-    mainWindow.loadFile(path.join(__dirname, '../dist/index.html'))
+    startProdServer().then((url) => {
+      mainWindow.loadURL(url)
+    })
   }
 
   mainWindow.once('ready-to-show', () => {
