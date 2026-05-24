@@ -4,6 +4,31 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>TG Free Downloader</title>
+  <script>
+    window.__errors = []
+    window.onerror = function(msg, url, line, col, err) {
+      window.__errors.push({ msg, url, line, col, err: err && err.stack })
+      showError(msg)
+    }
+    window.addEventListener('unhandledrejection', function(e) {
+      window.__errors.push({ msg: e.reason && e.reason.message, stack: e.reason && e.reason.stack })
+      showError(e.reason && e.reason.message || 'Promise rejected')
+    })
+    function showError(text) {
+      var el = document.getElementById('__error')
+      if (!el) {
+        el = document.createElement('div')
+        el.id = '__error'
+        el.style.cssText = 'position:fixed;bottom:0;left:0;right:0;background:#c00;color:#fff;padding:12px;font:13px monospace;z-index:99999;max-height:200px;overflow:auto;white-space:pre-wrap'
+        document.body.appendChild(el)
+      }
+      el.textContent = (el.textContent ? el.textContent + '\n---\n' : '') + text
+      el.style.display = 'block'
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('DOMContentLoaded - loading app...')
+    })
+  </script>
 </head>
 <body>
   <div id="app"></div>
