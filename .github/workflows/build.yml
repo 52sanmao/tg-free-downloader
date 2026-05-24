@@ -1,0 +1,62 @@
+name: Build
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version tag (e.g. v1.0.0)'
+        required: true
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - run: npm ci
+
+      - run: npx vite build
+
+      - name: Build Electron
+        run: npx electron-builder --win --config.extraMetadata.version=${{ github.event.inputs.version || github.ref_name }}
+        env:
+          VITE_API_ID: ${{ secrets.TG_API_ID }}
+          VITE_API_HASH: ${{ secrets.TG_API_HASH }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tg-free-downloader-windows
+          path: release/
+
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - run: npm ci
+
+      - run: npx vite build
+
+      - name: Build Electron
+        run: npx electron-builder --mac --config.extraMetadata.version=${{ github.event.inputs.version || github.ref_name }}
+        env:
+          VITE_API_ID: ${{ secrets.TG_API_ID }}
+          VITE_API_HASH: ${{ secrets.TG_API_HASH }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tg-free-downloader-macos
+          path: release/
