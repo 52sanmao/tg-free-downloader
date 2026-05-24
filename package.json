@@ -1,0 +1,50 @@
+{
+  "name": "tg-free-downloader",
+  "version": "1.0.0",
+  "description": "Telegram 媒体下载工具 - 开源免费，突破保存限制",
+  "main": "electron/main.js",
+  "scripts": {
+    "dev": "concurrently -k \"vite\" \"wait-on http://localhost:5173 && cross-env VITE_DEV_SERVER_URL=http://localhost:5173 electron .\"",
+    "build:vite": "vite build",
+    "build": "vite build && electron-builder",
+    "preview": "vite preview"
+  },
+  "keywords": ["telegram", "downloader", "media", "electron"],
+  "license": "MIT",
+  "dependencies": {
+    "dayjs": "^1.11.20",
+    "pinia": "^3.0.4",
+    "telegram": "^2.26.22",
+    "vue": "^3.5.34",
+    "vue-router": "^4.6.4"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^6.0.7",
+    "concurrently": "^9.1.2",
+    "cross-env": "^7.0.3",
+    "electron": "^42.2.0",
+    "electron-builder": "^26.8.1",
+    "vite": "^8.0.14",
+    "wait-on": "^8.0.3"
+  },
+  "build": {
+    "appId": "com.tg-free-downloader.app",
+    "productName": "TG Free Downloader",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": "zip",
+      "icon": null
+    },
+    "mac": {
+      "target": "dmg",
+      "icon": null
+    }
+  }
+}
